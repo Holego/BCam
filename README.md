@@ -8,7 +8,6 @@
 
 ## Файлы
 - `app/build.gradle.kts.txt` — зависимости (переименуй в `build.gradle.kts` в проекте)
-- `app/src/main/AndroidManifest.xml.txt` — манифест (переименуй в `AndroidManifest.xml`)
 - `app/src/main/java/.../MainActivity.kt` — экран с кнопкой
 - `app/src/main/java/.../RecordingService.kt` — foreground-сервис с логикой CameraX
 
