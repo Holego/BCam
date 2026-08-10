@@ -49,4 +49,7 @@ dependencies {
 
     // Core
     implementation("androidx.core:core-ktx:1.13.1")
+
+    // Работа с папками через Storage Access Framework
+    implementation("androidx.documentfile:documentfile:1.0.1")
 }

@@ -4,6 +4,7 @@ import android.app.*
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.provider.MediaStore
@@ -13,9 +14,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 
 class RecordingService : LifecycleService() {
 
@@ -25,7 +25,6 @@ class RecordingService : LifecycleService() {
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
 
-        // Простой способ сообщить UI о статусе (для реального проекта лучше StateFlow/EventBus)
         var isRecording = false
     }
 
@@ -70,6 +69,41 @@ class RecordingService : LifecycleService() {
     }
 
     private fun beginRecording() {
+        val hasAudioPermission = ContextCompat.checkSelfPermission(
+            this, android.Manifest.permission.RECORD_AUDIO
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        val savedFolderUriString = getSharedPreferences(
+            MainActivity.PREFS_NAME, MODE_PRIVATE
+        ).getString(MainActivity.KEY_FOLDER_URI, null)
+
+        val pendingRecording = if (savedFolderUriString != null) {
+            // Пользователь выбрал конкретную папку — пишем туда через SAF
+            prepareRecordingToCustomFolder(Uri.parse(savedFolderUriString))
+        } else {
+            // Папка не выбрана — используем стандартную Movies/VideoRecorder
+            prepareRecordingToMediaStore()
+        }
+
+        activeRecording = pendingRecording
+            ?.apply { if (hasAudioPermission) withAudioEnabled() }
+            ?.start(ContextCompat.getMainExecutor(this)) { }
+
+        isRecording = true
+    }
+
+    private fun prepareRecordingToCustomFolder(folderUri: Uri): PendingRecording? {
+        val folder = DocumentFile.fromTreeUri(this, folderUri) ?: return null
+        val fileName = "VID_${System.currentTimeMillis()}.mp4"
+        val newFile = folder.createFile("video/mp4", fileName) ?: return null
+
+        val pfd = contentResolver.openFileDescriptor(newFile.uri, "rw") ?: return null
+        val outputOptions = FileDescriptorOutputOptions.Builder(pfd).build()
+
+        return videoCapture?.output?.prepareRecording(this, outputOptions)
+    }
+
+    private fun prepareRecordingToMediaStore(): PendingRecording? {
         val name = "VID_${System.currentTimeMillis()}.mp4"
         val contentValues = ContentValues().apply {
             put(MediaStore.Video.Media.DISPLAY_NAME, name)
@@ -81,16 +115,7 @@ class RecordingService : LifecycleService() {
             .setContentValues(contentValues)
             .build()
 
-        val hasAudioPermission = ContextCompat.checkSelfPermission(
-            this, android.Manifest.permission.RECORD_AUDIO
-        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-
-        activeRecording = videoCapture?.output
-            ?.prepareRecording(this, outputOptions)
-            ?.apply { if (hasAudioPermission) withAudioEnabled() }
-            ?.start(ContextCompat.getMainExecutor(this)) { }
-
-        isRecording = true
+        return videoCapture?.output?.prepareRecording(this, outputOptions)
     }
 
     private fun stopRecordingFlow() {
