@@ -14,7 +14,9 @@
 
     <application
         android:allowBackup="true"
-        android:label="Video Recorder"
+        android:label="BCam"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar"
         android:supportsRtl="true">
 
