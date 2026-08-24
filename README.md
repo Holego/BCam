@@ -5,12 +5,7 @@ app** — from a home-screen widget or the Stop button in the notification. It k
 recording with the screen off and does nothing else.
 
 Kotlin + CameraX + Foreground Service + Storage Access Framework. No Compose, no WebView,
-no Flutter, no React Native, no heavy third-party libraries.
-
-Interface languages: **English** (default) and **Russian**. Switchable in-app from the
-**Language** row — System default / English / Русский — via `AppCompatDelegate`
-per-app locales, which Android 13+ also exposes under *Settings → System → Languages →
-App languages*.
+no Flutter, no React Native, no heavy third-party libraries. 
 
 ---
 
