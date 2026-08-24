@@ -49,6 +49,11 @@ android {
                 keyAlias = signingProp("RELEASE_KEY_ALIAS")
                 keyPassword = signingProp("RELEASE_KEY_PASSWORD")
             }
+            // v2 covers installation and integrity on Android 7+. v3 is not on by default
+            // in AGP but is what makes key rotation possible later, so it is worth having
+            // from the very first signed build.
+            enableV2Signing = true
+            enableV3Signing = true
         }
     }
 

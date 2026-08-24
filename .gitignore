@@ -8,6 +8,10 @@ build/
 .externalNativeBuild
 .cxx
 local.properties
+RELEASE_STORE_FILE=C:/GoshanData/keys/bcam-release.jks
+RELEASE_STORE_PASSWORD=bo4A4FqxwYQ7p5L
+RELEASE_KEY_ALIAS=bcam
+RELEASE_KEY_PASSWORD=bo4A4FqxwYQ7p5L
 
 # Locally staged APKs for testing
 /apk/
