@@ -1,4 +1,4 @@
-package com.example.videorecorder.camera
+package io.github.holego.bcam.camera
 
 import android.content.Context
 import android.hardware.camera2.CameraCharacteristics

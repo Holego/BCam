@@ -1,4 +1,4 @@
-package com.example.videorecorder.recording
+package io.github.holego.bcam.recording
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -9,8 +9,8 @@ import android.content.Intent
 import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.videorecorder.MainActivity
-import com.example.videorecorder.R
+import io.github.holego.bcam.MainActivity
+import io.github.holego.bcam.R
 
 /**
  * The persistent recording notification and the error notification.

@@ -1,9 +1,9 @@
-package com.example.videorecorder.camera
+package io.github.holego.bcam.camera
 
 import androidx.annotation.StringRes
 import androidx.camera.core.CameraSelector
 import androidx.camera.video.Quality
-import com.example.videorecorder.R
+import io.github.holego.bcam.R
 
 /**
  * One camera the app can actually bind to, as reported by CameraX and enriched with

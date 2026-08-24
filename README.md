@@ -242,3 +242,9 @@ adb logcat -s RecorderApp RecordingService CameraManager Widget
 Logged: camera list and selection, camera id, chosen quality / bitrate / frame rate,
 initialisation, output file URI, start, stop, `Finalize`, and every error.
 `VideoRecordEvent.Status` is deliberately not logged so it cannot flood logcat.
+
+---
+
+## License
+
+[MIT](LICENSE) © 2026 Holego

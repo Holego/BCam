@@ -30,11 +30,11 @@ fun signingProp(name: String): String? =
 val hasReleaseKeystore = signingProp("RELEASE_STORE_FILE") != null
 
 android {
-    namespace = "com.example.videorecorder"
+    namespace = "io.github.holego.bcam"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.videorecorder"
+        applicationId = "io.github.holego.bcam"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

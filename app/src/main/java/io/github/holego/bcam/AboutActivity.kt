@@ -1,4 +1,4 @@
-package com.example.videorecorder
+package io.github.holego.bcam
 
 import android.content.ActivityNotFoundException
 import android.content.ClipData
@@ -9,7 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.videorecorder.databinding.ActivityAboutBinding
+import io.github.holego.bcam.databinding.ActivityAboutBinding
 
 /**
  * What the app is, what it does not do with your data, and how to reach the author.

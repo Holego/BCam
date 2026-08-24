@@ -1,9 +1,9 @@
-package com.example.videorecorder.recording
+package io.github.holego.bcam.recording
 
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
-import com.example.videorecorder.widget.RecordingWidgetProvider
+import io.github.holego.bcam.widget.RecordingWidgetProvider
 import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

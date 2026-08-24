@@ -1,4 +1,4 @@
-package com.example.videorecorder.recording
+package io.github.holego.bcam.recording
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -32,13 +32,13 @@ import androidx.camera.video.VideoRecordEvent
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
-import com.example.videorecorder.R
-import com.example.videorecorder.camera.CameraRepository
-import com.example.videorecorder.camera.CompressionOption
-import com.example.videorecorder.camera.VideoQualityOption
-import com.example.videorecorder.settings.SettingsRepository
-import com.example.videorecorder.storage.StorageResult
-import com.example.videorecorder.storage.VideoStorageManager
+import io.github.holego.bcam.R
+import io.github.holego.bcam.camera.CameraRepository
+import io.github.holego.bcam.camera.CompressionOption
+import io.github.holego.bcam.camera.VideoQualityOption
+import io.github.holego.bcam.settings.SettingsRepository
+import io.github.holego.bcam.storage.StorageResult
+import io.github.holego.bcam.storage.VideoStorageManager
 
 /**
  * Owns everything about an active recording: the CameraX binding, the [VideoCapture] use
@@ -650,9 +650,9 @@ class RecordingService : LifecycleService() {
     companion object {
         private const val TAG = "RecordingService"
 
-        const val ACTION_START = "com.example.videorecorder.action.START"
-        const val ACTION_STOP = "com.example.videorecorder.action.STOP"
-        const val ACTION_TOGGLE = "com.example.videorecorder.action.TOGGLE"
+        const val ACTION_START = "io.github.holego.bcam.action.START"
+        const val ACTION_STOP = "io.github.holego.bcam.action.STOP"
+        const val ACTION_TOGGLE = "io.github.holego.bcam.action.TOGGLE"
 
         /** See [acquireWakeLock]. Flip to false to measure a device without it. */
         private const val USE_WAKE_LOCK = true

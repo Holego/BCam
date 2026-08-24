@@ -1,4 +1,4 @@
-package com.example.videorecorder.widget
+package io.github.holego.bcam.widget
 
 import android.Manifest
 import android.app.PendingIntent
@@ -11,13 +11,13 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
-import com.example.videorecorder.MainActivity
-import com.example.videorecorder.R
-import com.example.videorecorder.recording.RecordingService
-import com.example.videorecorder.recording.RecordingState
-import com.example.videorecorder.recording.RecordingStateHolder
-import com.example.videorecorder.settings.SettingsRepository
-import com.example.videorecorder.storage.VideoStorageManager
+import io.github.holego.bcam.MainActivity
+import io.github.holego.bcam.R
+import io.github.holego.bcam.recording.RecordingService
+import io.github.holego.bcam.recording.RecordingState
+import io.github.holego.bcam.recording.RecordingStateHolder
+import io.github.holego.bcam.settings.SettingsRepository
+import io.github.holego.bcam.storage.VideoStorageManager
 
 /**
  * One-button home-screen widget: tap to start, tap again to stop.

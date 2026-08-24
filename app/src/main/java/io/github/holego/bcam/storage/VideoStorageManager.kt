@@ -1,4 +1,4 @@
-package com.example.videorecorder.storage
+package io.github.holego.bcam.storage
 
 import android.content.Context
 import android.content.Intent
@@ -9,8 +9,8 @@ import android.system.Os
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
-import com.example.videorecorder.R
-import com.example.videorecorder.settings.SettingsRepository
+import io.github.holego.bcam.R
+import io.github.holego.bcam.settings.SettingsRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

@@ -1,4 +1,4 @@
-package com.example.videorecorder.settings
+package io.github.holego.bcam.settings
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -42,7 +42,7 @@ class SettingsRepository(context: Context) {
         get() = prefs.getString(KEY_QUALITY, DEFAULT_QUALITY_KEY) ?: DEFAULT_QUALITY_KEY
         set(value) = prefs.edit().putString(KEY_QUALITY, value).apply()
 
-    /** Key of the selected [com.example.videorecorder.camera.CompressionOption]. */
+    /** Key of the selected [io.github.holego.bcam.camera.CompressionOption]. */
     var compressionKey: String
         get() = prefs.getString(KEY_COMPRESSION, DEFAULT_COMPRESSION_KEY) ?: DEFAULT_COMPRESSION_KEY
         set(value) = prefs.edit().putString(KEY_COMPRESSION, value).apply()
