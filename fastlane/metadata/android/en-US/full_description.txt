@@ -1,0 +1,18 @@
+Background Camera is an application for simple video recording in the background.
+
+After a one-time setup, recording is started and stopped from a home-screen widget or from the notification, without opening the application, and continues while the screen is off.
+
+Features:
+
+* One-tap home-screen widget: tap to start, tap again to stop
+* Stop button in the ongoing notification
+* Recording keeps going with the screen locked and after the app is removed from Recents
+* Videos are written straight into a folder you choose, through the Storage Access Framework
+* Pick the camera, resolution, file size, frame rate, and whether to record audio
+* English and Russian, switchable inside the app
+
+Privacy:
+
+The application does not collect, store or transmit any data. There is no account, no analytics, no crash reporting and no telemetry, and the app declares no internet permission at all. Recordings never leave the device. Settings are kept in the application's private storage.
+
+Only the permissions actually needed for recording are requested: camera, microphone (only when audio recording is enabled), notifications for the recording indicator, and a wake lock so that recording survives the screen turning off.
