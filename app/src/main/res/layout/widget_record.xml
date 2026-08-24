@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Kept to the views RemoteViews supports: LinearLayout, ImageView, TextView.
+    The root is the tap target so the widget reacts anywhere the user hits it.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/widget_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/widget_button_idle"
+        android:contentDescription="@string/widget_description"
+        android:padding="10dp"
+        android:src="@drawable/ic_record" />
+
+    <TextView
+        android:id="@+id/widget_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:shadowColor="#B0000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="3"
+        android:text="@string/widget_record"
+        android:textColor="@color/widget_label"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+</LinearLayout>

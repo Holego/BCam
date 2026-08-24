@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Русский перевод. Значения по умолчанию (английские) — в values/strings.xml. -->
+<resources>
+    <!-- Главный экран -->
+    <string name="section_recording">Запись</string>
+    <string name="row_folder">Папка для видео</string>
+    <string name="row_camera">Камера</string>
+    <string name="row_quality">Качество видео</string>
+    <string name="row_compression">Размер файла</string>
+    <string name="row_fps">Частота кадров</string>
+    <string name="row_audio">Записывать звук</string>
+    <string name="section_status">Статус</string>
+    <string name="value_not_selected">Не выбрана</string>
+    <string name="value_default_camera">По умолчанию</string>
+    <string name="fps_auto">Авто</string>
+    <string name="fps_value">%1$d FPS</string>
+    <string name="audio_hint_no_permission">Нет разрешения на микрофон — видео запишется без звука</string>
+    <string name="footer_widget_hint">Виджет можно добавить с главного экрана Android.</string>
+
+    <!-- Размер файла -->
+    <string name="compression_standard">Стандартный</string>
+    <string name="compression_light">Лёгкий (примерно на 40%% меньше)</string>
+    <string name="compression_small">Минимальный (примерно на 65%% меньше)</string>
+
+    <!-- Строка статуса -->
+    <string name="status_idle">Не записывается</string>
+    <string name="status_recording">Идет запись: %1$s</string>
+    <string name="status_starting">Подготовка камеры…</string>
+    <string name="status_stopping">Завершение записи…</string>
+    <string name="status_need_camera">Требуется разрешение на камеру</string>
+    <string name="status_need_folder">Выберите папку для записи</string>
+
+    <!-- Кнопки -->
+    <string name="button_start">Начать запись</string>
+    <string name="button_stop">Остановить запись</string>
+
+    <!-- Уведомления -->
+    <string name="channel_recording">Запись видео</string>
+    <string name="channel_recording_description">Постоянное уведомление во время записи</string>
+    <string name="channel_errors">Ошибки записи</string>
+    <string name="channel_errors_description">Сообщения о проблемах при записи</string>
+    <string name="notification_recording_title">Запись видео</string>
+    <string name="notification_preparing_title">Запись видео</string>
+    <string name="notification_preparing_text">Подготовка камеры…</string>
+    <string name="notification_stopping_title">Завершение записи…</string>
+    <string name="notification_stop">Остановить</string>
+    <string name="notification_error_title">Ошибка записи</string>
+
+    <!-- Виджет -->
+    <string name="widget_description">Начать или остановить запись видео одним нажатием</string>
+    <string name="finish_setup_first">Сначала завершите настройку приложения</string>
+
+    <!-- О приложении -->
+    <string name="row_about">О приложении</string>
+    <string name="about_title">О приложении</string>
+    <string name="about_intro">Background Camera — приложение для простой записи видео в фоновом режиме. После однократной настройки запись запускается и останавливается виджетом с рабочего стола или из уведомления, без открытия приложения, и продолжается при выключенном экране.</string>
+    <string name="about_privacy_title">Ваши данные остаются на устройстве</string>
+    <string name="about_privacy_body">Приложение не собирает, не хранит и не передаёт никаких данных. Здесь нет аккаунта, аналитики, отчётов о сбоях и телеметрии, а в этой сборке вообще не объявлено разрешение на доступ к сети. Записи сохраняются напрямую в выбранную вами папку и не покидают устройство. Настройки хранятся в приватном хранилище приложения.\n\nЗапрашиваются только те разрешения, которые нужны для записи: камера, микрофон (только когда включена запись звука), уведомления для индикатора записи и wake lock, чтобы запись продолжалась при выключенном экране.</string>
+    <string name="about_source_title">Исходный код</string>
+    <string name="about_source_body">Приложение с открытым исходным кодом. Сборка, опубликованная на F-Droid и GitHub, не содержит рекламы, платежей и вообще никакого доступа к сети.</string>
+    <string name="about_contact_title">Связь</string>
+    <string name="about_github">GitHub — Holego</string>
+    <string name="about_jabber">Jabber — Jopirat@jabber.fr</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_copied">Скопировано в буфер обмена</string>
+    <string name="about_no_browser">Нет приложения, которое может открыть эту ссылку</string>
+
+    <!-- Ошибки -->
+    <string name="error_no_folder">Папка для видео не выбрана</string>
+    <string name="error_folder_permission_lost">Доступ к папке потерян. Выберите папку заново.</string>
+    <string name="error_folder_missing">Выбранная папка недоступна. Выберите папку заново.</string>
+    <string name="error_create_file">Не удалось создать файл в выбранной папке</string>
+    <string name="error_open_file">Не удалось открыть файл для записи</string>
+    <string name="error_low_space">Недостаточно свободного места</string>
+    <string name="error_no_camera_permission">Нет разрешения на использование камеры</string>
+    <string name="error_camera_busy">Камера занята другим приложением</string>
+    <string name="error_camera_unavailable">Камера недоступна</string>
+    <string name="error_camerax">Ошибка камеры. Попробуйте еще раз.</string>
+    <string name="error_service_start">Android не разрешил запустить запись. Откройте приложение и повторите.</string>
+    <string name="error_size_limit">Достигнут предел размера файла</string>
+    <string name="error_no_valid_data">Запись оказалась пустой и была удалена</string>
+    <string name="error_source_inactive">Камера была отключена во время записи</string>
+    <string name="error_encoding">Ошибка кодирования видео</string>
+    <string name="error_finalize_unknown">Запись завершилась с ошибкой</string>
+    <string name="error_no_qualities">Не удалось определить поддерживаемые качества</string>
+    <string name="audio_permission_denied">Без разрешения на микрофон видео будет записано без звука</string>
+    <string name="about_close">Закрыть</string>
+    <string name="row_language">Язык</string>
+    <string name="language_system">Системный</string>
+</resources>

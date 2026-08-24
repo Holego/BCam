@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    updatePeriodMillis="0": the widget is never refreshed on a timer. It is redrawn only
+    when the recording state actually changes, which the service triggers explicitly.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_description"
+    android:initialLayout="@layout/widget_record"
+    android:minHeight="50dp"
+    android:minWidth="50dp"
+    android:previewImage="@drawable/ic_record"
+    android:previewLayout="@layout/widget_record"
+    android:resizeMode="none"
+    android:targetCellHeight="1"
+    android:targetCellWidth="1"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Default (English) strings. Russian translations live in values-ru/strings.xml. -->
+<resources>
+    <string name="app_name" translatable="false">Background Camera</string>
+
+    <!-- Main screen -->
+    <string name="section_recording">Recording</string>
+    <string name="row_folder">Video folder</string>
+    <string name="row_camera">Camera</string>
+    <string name="row_quality">Video quality</string>
+    <string name="row_compression">File size</string>
+    <string name="row_fps">Frame rate</string>
+    <string name="row_audio">Record audio</string>
+    <string name="section_status">Status</string>
+    <string name="value_not_selected">Not selected</string>
+    <string name="value_default_camera">Default</string>
+    <string name="fps_auto">Auto</string>
+    <string name="fps_value">%1$d FPS</string>
+    <string name="audio_hint_no_permission">No microphone permission — video will be recorded without sound</string>
+    <string name="footer_widget_hint">The widget can be added from your Android home screen.</string>
+
+    <!-- File size / compression -->
+    <string name="compression_standard">Standard</string>
+    <string name="compression_light">Light (~40%% smaller)</string>
+    <string name="compression_small">Smallest (~65%% smaller)</string>
+
+    <!-- Status line -->
+    <string name="status_idle">Not recording</string>
+    <string name="status_recording">Recording: %1$s</string>
+    <string name="status_starting">Preparing camera…</string>
+    <string name="status_stopping">Finishing recording…</string>
+    <string name="status_need_camera">Camera permission required</string>
+    <string name="status_need_folder">Select a recording folder</string>
+
+    <!-- Buttons -->
+    <string name="button_start">Start recording</string>
+    <string name="button_stop">Stop recording</string>
+
+    <!-- Notifications -->
+    <string name="channel_recording">Video recording</string>
+    <string name="channel_recording_description">Ongoing notification shown while recording</string>
+    <string name="channel_errors">Recording errors</string>
+    <string name="channel_errors_description">Messages about recording problems</string>
+    <string name="notification_recording_title">Video recording</string>
+    <string name="notification_preparing_title">Video recording</string>
+    <string name="notification_preparing_text">Preparing camera…</string>
+    <string name="notification_stopping_title">Finishing recording…</string>
+    <string name="notification_stop">Stop</string>
+    <string name="notification_error_title">Recording error</string>
+
+    <!-- Widget -->
+    <string name="widget_record" translatable="false">REC</string>
+    <string name="widget_stop" translatable="false">STOP</string>
+    <string name="widget_starting" translatable="false">…</string>
+    <string name="widget_description">Start or stop video recording with one tap</string>
+    <string name="finish_setup_first">Finish setting up the app first</string>
+
+    <!-- About -->
+    <string name="row_about">About</string>
+    <string name="about_title">About this app</string>
+    <string name="about_intro">Background Camera is an application for simple video recording in the background. After a one-time setup, recording is started and stopped from a home-screen widget or from the notification, without opening the application, and continues while the screen is off.</string>
+    <string name="about_privacy_title">Your data stays on your device</string>
+    <string name="about_privacy_body">The application does not collect, store or transmit any data. There is no account, no analytics, no crash reporting and no telemetry, and this build declares no network permission at all. Recordings are written directly into the folder you select and never leave the device. Settings are kept in the application\'s private storage.\n\nOnly the permissions required for recording are requested: camera, microphone (only when audio recording is enabled), notifications for the recording indicator, and a wake lock so that recording continues while the screen is off.</string>
+    <string name="about_source_title">Source code</string>
+    <string name="about_source_body">This app is open source. The build published on F-Droid and GitHub contains no ads, no billing and no network access at all.</string>
+    <string name="about_contact_title">Contact</string>
+    <string name="about_github">GitHub — Holego</string>
+    <string name="about_jabber">Jabber — Jopirat@jabber.fr</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_copied">Copied to clipboard</string>
+    <string name="about_no_browser">No app available to open this link</string>
+
+    <!-- Errors -->
+    <string name="error_no_folder">No video folder selected</string>
+    <string name="error_folder_permission_lost">Access to the folder was lost. Please pick it again.</string>
+    <string name="error_folder_missing">The selected folder is unavailable. Please pick it again.</string>
+    <string name="error_create_file">Could not create a file in the selected folder</string>
+    <string name="error_open_file">Could not open the file for writing</string>
+    <string name="error_low_space">Not enough free space</string>
+    <string name="error_no_camera_permission">No camera permission</string>
+    <string name="error_camera_busy">The camera is in use by another app</string>
+    <string name="error_camera_unavailable">Camera unavailable</string>
+    <string name="error_camerax">Camera error. Please try again.</string>
+    <string name="error_service_start">Android refused to start the recording. Open the app and try again.</string>
+    <string name="error_size_limit">File size limit reached</string>
+    <string name="error_no_valid_data">The recording came out empty and was deleted</string>
+    <string name="error_source_inactive">The camera was disconnected during recording</string>
+    <string name="error_encoding">Video encoding error</string>
+    <string name="error_finalize_unknown">The recording finished with an error</string>
+    <string name="error_no_qualities">Could not determine supported qualities</string>
+    <string name="audio_permission_denied">Without microphone permission the video will be recorded without sound</string>
+    <string name="about_close">Close</string>
+    <string name="row_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_ru" translatable="false">Русский</string>
+</resources>
