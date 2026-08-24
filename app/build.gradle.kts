@@ -1,7 +1,33 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+/*
+ * Release signing.
+ *
+ * Key material is read from local.properties (git-ignored) or from the environment, so
+ * nothing secret ever enters the repository. When no keystore is configured the release
+ * build is simply left unsigned rather than failing, which keeps `assembleRelease`
+ * working for F-Droid and for anyone who just clones the repo.
+ *
+ * To sign locally, add to local.properties:
+ *   RELEASE_STORE_FILE=C:/path/outside/the/repo/bcam-release.jks
+ *   RELEASE_STORE_PASSWORD=...
+ *   RELEASE_KEY_ALIAS=bcam
+ *   RELEASE_KEY_PASSWORD=...
+ */
+val localProperties = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
+fun signingProp(name: String): String? =
+    (localProperties.getProperty(name) ?: System.getenv(name))?.takeIf { it.isNotBlank() }
+
+val hasReleaseKeystore = signingProp("RELEASE_STORE_FILE") != null
 
 android {
     namespace = "com.example.videorecorder"
@@ -15,8 +41,24 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            signingProp("RELEASE_STORE_FILE")?.let { path ->
+                storeFile = file(path)
+                storePassword = signingProp("RELEASE_STORE_PASSWORD")
+                keyAlias = signingProp("RELEASE_KEY_ALIAS")
+                keyPassword = signingProp("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            // R8 is left off deliberately: the app is small, and shrinking has not been
+            // verified on a device.
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

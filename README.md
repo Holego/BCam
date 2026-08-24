@@ -17,11 +17,36 @@ App languages*.
 ## Building
 
 ```bash
-gradlew assembleDebug     # installable, debug-signed
-gradlew assembleRelease   # unsigned - add your keystore first
+gradlew assembleDebug     # installable, debug-signed, debuggable
+gradlew assembleRelease   # unsigned unless a keystore is configured
 ```
 
 The APK declares no `INTERNET` permission.
+
+### Signing a release build
+
+Create a keystore once, and keep it **outside** the repository:
+
+```bash
+keytool -genkey -v -keystore bcam-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias bcam
+```
+
+Then point `local.properties` at it — that file is git-ignored, so no key material
+enters the repository:
+
+```properties
+RELEASE_STORE_FILE=C:/path/outside/the/repo/bcam-release.jks
+RELEASE_STORE_PASSWORD=...
+RELEASE_KEY_ALIAS=bcam
+RELEASE_KEY_PASSWORD=...
+```
+
+The same four values are also read from the environment, which is what CI should use.
+With none of them set, `assembleRelease` still succeeds and simply produces an unsigned
+APK, so cloning and building the project never requires a key.
+
+Keep this keystore safe and backed up: Android identifies an app by package name **and**
+signing key, so losing it means no future version can update an installed one.
 
 ---
 
