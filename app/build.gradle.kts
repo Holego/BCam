@@ -62,6 +62,14 @@ android {
             if (hasReleaseKeystore) {
                 signingConfig = signingConfigs.getByName("release")
             }
+            // AGP 8 embeds the git commit of the build machine into
+            // META-INF/version-control-info.textproto. That single file changes between
+            // otherwise identical builds and is enough to break F-Droid's reproducible
+            // build verification, so it is left out.
+            vcsInfo {
+                include = false
+            }
+
             // R8 is left off deliberately: the app is small, and shrinking has not been
             // verified on a device.
             isMinifyEnabled = false
