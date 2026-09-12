@@ -85,6 +85,15 @@ android {
         buildConfig = true
     }
 
+    // AGP embeds a "Dependency metadata" block into the APK's signing block, meant for
+    // the Play Console's dependency report. It is not a standard part of the APK format,
+    // and F-Droid's scanner flags it as an unrecognised extra signing block, so it is
+    // turned off - this app is not distributed through Play anyway.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
