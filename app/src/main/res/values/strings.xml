@@ -64,6 +64,7 @@
     <string name="about_source_title">Source code</string>
     <string name="about_source_body">This app is open source. The build published on F-Droid and GitHub contains no ads, no billing and no network access at all.</string>
     <string name="about_contact_title">Contact</string>
+    <string name="about_privacy_policy">Privacy policy</string>
     <string name="about_github">GitHub — Holego</string>
     <string name="about_jabber">Jabber — Jopirat@jabber.fr</string>
     <string name="about_version">Version %1$s</string>

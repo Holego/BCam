@@ -8,7 +8,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import io.github.holego.bcam.databinding.ActivityAboutBinding
 
 /**
@@ -19,12 +23,21 @@ class AboutActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAboutBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityAboutBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            view.updatePadding(bars.left, bars.top, bars.right, bars.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
 
         binding.version.text = getString(R.string.about_version, BuildConfig.VERSION_NAME)
 
+        binding.rowPrivacyPolicy.setOnClickListener { open(PRIVACY_POLICY_URL) }
         binding.rowGithub.setOnClickListener { open(GITHUB_URL) }
         binding.rowJabber.setOnClickListener { openJabber() }
 
@@ -63,6 +76,9 @@ class AboutActivity : AppCompatActivity() {
 
     companion object {
         private const val GITHUB_URL = "https://github.com/Holego"
+
+        /** Also entered as the privacy policy URL in the Play Console. */
+        private const val PRIVACY_POLICY_URL = "https://github.com/Holego/BCam/blob/main/PRIVACY.md"
         private const val JABBER_ID = "Jopirat@jabber.fr"
     }
 }

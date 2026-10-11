@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Google Play build only. The two about_* strings replace the ones in src/main: the
+    "nothing leaves your device, no network permission" wording is true of the F-Droid build
+    and would be false here.
+-->
+<resources>
+    <string name="about_privacy_body">Your videos never leave your device: recordings are written straight into the folder you choose, and the app has no account, no analytics and no crash reporting of its own.\n\nThis free version shows ads from Google AdMob. To serve them, Google may use your device\'s advertising ID and approximate location, depending on the choice you make in the consent message. If you are in the EEA, the UK or Switzerland you can review or change that choice at any time under \"Ad privacy settings\" on the main screen. A one-time purchase removes all ads, and the ad SDK is then never started.\n\nOnly the permissions required for recording are requested: camera, microphone (only when audio recording is enabled), notifications for the recording indicator, and a wake lock so that recording continues while the screen is off. The network permission is used only for ads and for the purchase.</string>
+    <string name="about_source_body">This app is open source. The build published on F-Droid and GitHub contains no ads, no billing and no network access at all; this Google Play build adds ads and a one-time \"remove ads\" purchase.</string>
+
+    <!-- Ads block on the main screen -->
+    <string name="ads_title">Ads</string>
+    <string name="ads_status_on">This free version shows ads. Ads never appear while you are recording.</string>
+    <string name="ads_status_removed">Ads are removed. Thank you for your support!</string>
+    <string name="ads_status_reward">Ads are off for another %1$d h %2$d min.</string>
+    <string name="ads_remove_button">Remove ads for good — %1$s</string>
+    <string name="ads_remove_button_noprice">Remove ads</string>
+    <string name="ads_reward_button">Watch a video — no ads for 24 hours</string>
+    <string name="ads_privacy_options">Ad privacy settings</string>
+    <string name="ads_video_not_ready">The video isn\'t ready yet. Please try again in a moment.</string>
+    <string name="ad_badge">Ad</string>
+
+    <!-- Purchase -->
+    <string name="purchase_unavailable">Purchases are unavailable right now. Please try again later.</string>
+    <string name="purchase_pending">Your payment is pending. Ads will be removed once it completes.</string>
+    <string name="purchase_failed">The purchase could not be completed.</string>
+    <string name="purchase_thanks">Thank you! Ads have been removed.</string>
+
+    <!-- Reward offer shown after a recording is stopped -->
+    <string name="reward_offer_title">Take a break from ads?</string>
+    <string name="reward_offer_message">Watch a short video and the app will show no ads for the next 24 hours.</string>
+    <string name="reward_offer_watch">Watch video</string>
+    <string name="reward_offer_skip">Not now</string>
+    <string name="reward_granted">No ads for 24 hours. Enjoy!</string>
+</resources>

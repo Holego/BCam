@@ -9,12 +9,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -23,6 +27,7 @@ import io.github.holego.bcam.camera.CameraRepository
 import io.github.holego.bcam.camera.CompressionOption
 import io.github.holego.bcam.camera.VideoQualityOption
 import io.github.holego.bcam.databinding.ActivityMainBinding
+import io.github.holego.bcam.monetization.MonetizationController
 import io.github.holego.bcam.recording.RecordingService
 import io.github.holego.bcam.recording.RecordingState
 import io.github.holego.bcam.recording.RecordingStateHolder
@@ -47,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settings: SettingsRepository
     private lateinit var storage: VideoStorageManager
     private lateinit var cameraRepository: CameraRepository
+    private lateinit var monetization: MonetizationController
 
     private var cameras: List<CameraInfoModel> = emptyList()
 
@@ -56,6 +62,14 @@ class MainActivity : AppCompatActivity() {
      * at 1 Hz. Refreshed by [refreshRows], i.e. on every start and after every change.
      */
     private var folderUsable = false
+
+    /**
+     * Only used to tell "the user pressed Stop in this screen and watched it finish" from
+     * every other way a recording can end, so that the (Google Play build's) ads appear at
+     * that natural pause and nowhere else. Meaningless in the foss build.
+     */
+    private var lastObservedState = RecordingStateHolder.current.state
+    private var stopRequestedInApp = false
 
     private val folderPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
@@ -97,15 +111,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // targetSdk 35+ draws edge to edge whether asked to or not; asking explicitly keeps
+        // the system bars styled correctly in light and dark themes.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        applySystemBarInsets()
 
         settings = SettingsRepository(this)
         storage = VideoStorageManager(this, settings)
         cameraRepository = CameraRepository(this)
+        monetization = MonetizationController(this)
 
-        binding.rowFolder.setOnClickListener { folderPicker.launch(null) }
+        binding.rowFolder.setOnClickListener { launchFolderPicker() }
         binding.rowCamera.setOnClickListener { showCameraDialog() }
         binding.rowQuality.setOnClickListener { showQualityDialog() }
         binding.rowCompression.setOnClickListener { showCompressionDialog() }
@@ -115,12 +134,14 @@ class MainActivity : AppCompatActivity() {
         binding.primaryButton.setOnClickListener { onPrimaryClick() }
         binding.rowLanguage.setOnClickListener { showLanguageDialog() }
         binding.rowAbout.setOnClickListener {
+            monetization.onLeavingForSystemScreen()
             startActivity(Intent(this, AboutActivity::class.java))
         }
 
         handleSetupHint(intent)
         loadCameras()
         observeRecordingState()
+        monetization.attach(savedInstanceState)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -133,6 +154,13 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         // Permissions and the folder can change while the app is in the background.
         refreshRows()
+    }
+
+    override fun onStop() {
+        // A recording that finishes while the app is in the background is not the
+        // "just pressed Stop" moment, so it must not trigger anything on return.
+        stopRequestedInApp = false
+        super.onStop()
     }
 
     /** The widget sends the user here when the app has not been fully configured yet. */
@@ -148,7 +176,10 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    RecordingStateHolder.status.collect { render(it) }
+                    RecordingStateHolder.status.collect {
+                        render(it)
+                        trackStopForMonetization(it)
+                    }
                 }
                 launch {
                     // Keeps the elapsed-time readout moving while the screen is visible.
@@ -157,6 +188,19 @@ class MainActivity : AppCompatActivity() {
                         delay(1000L)
                     }
                 }
+            }
+        }
+    }
+
+    private fun trackStopForMonetization(status: RecordingStatus) {
+        val previous = lastObservedState
+        lastObservedState = status.state
+        when {
+            status.state == RecordingState.STARTING -> stopRequestedInApp = false
+            stopRequestedInApp && status.state == RecordingState.IDLE &&
+                (previous == RecordingState.RECORDING || previous == RecordingState.STOPPING) -> {
+                stopRequestedInApp = false
+                monetization.onRecordingStoppedByUser()
             }
         }
     }
@@ -234,6 +278,7 @@ class MainActivity : AppCompatActivity() {
         when (RecordingStateHolder.current.state) {
             RecordingState.RECORDING -> {
                 Log.i(TAG, "Stop requested from the app")
+                stopRequestedInApp = true
                 RecordingService.send(this, RecordingService.ACTION_STOP)
             }
             RecordingState.STARTING, RecordingState.STOPPING -> Unit // button is disabled
@@ -249,7 +294,7 @@ class MainActivity : AppCompatActivity() {
         if (!storage.hasUsableFolder()) {
             val error = storage.folderError()
             if (error != null) toast(getString(error.messageRes))
-            folderPicker.launch(null)
+            launchFolderPicker()
             return
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -394,6 +439,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ------------------------------------------------------------------ helpers
+
+    /** The picker is another app's screen; coming back from it is not "returning to the app". */
+    private fun launchFolderPicker() {
+        monetization.onLeavingForSystemScreen()
+        folderPicker.launch(null)
+    }
+
+    /**
+     * Keeps the content (and the banner under it) clear of the status bar, the navigation
+     * bar and any display cutout now that the window is drawn edge to edge.
+     */
+    private fun applySystemBarInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            view.updatePadding(bars.left, bars.top, bars.right, bars.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+    }
 
     private fun loadCameras() {
         lifecycleScope.launch {
