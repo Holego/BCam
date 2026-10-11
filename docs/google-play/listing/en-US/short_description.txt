@@ -1,0 +1,1 @@
+Record video with the screen off, started from a home-screen widget.

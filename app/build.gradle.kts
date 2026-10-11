@@ -160,11 +160,17 @@ kotlin {
 // CameraX's ProcessCameraProvider.getInstance() returns a Guava ListenableFuture, which the
 // app uses directly. The ads and billing libraries drag in
 // "listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"; being the higher version it
-// wins conflict resolution, and being empty it removes the class from the compile classpath.
-// Pinning the real 1.0 artifact (just the one interface) fixes that. Without the play
-// libraries 1.0 is what resolves anyway, so this changes nothing for the foss build.
+// wins conflict resolution, and being empty it removes the class from the *compile*
+// classpath. Pinning the real 1.0 artifact (just the one interface) there fixes that.
+//
+// Compile classpaths only: at runtime the play flavor already contains the full Guava, and
+// forcing 1.0 there as well would put ListenableFuture on the classpath twice (the duplicate
+// class check fails the build). Without the play libraries 1.0 is what resolves anyway, so
+// none of this changes the foss build.
 configurations.configureEach {
-    resolutionStrategy.force("com.google.guava:listenablefuture:1.0")
+    if (name.endsWith("CompileClasspath", ignoreCase = true)) {
+        resolutionStrategy.force("com.google.guava:listenablefuture:1.0")
+    }
 }
 
 dependencies {

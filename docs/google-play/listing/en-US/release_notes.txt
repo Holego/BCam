@@ -1,0 +1,1 @@
+First release on Google Play: start and stop recording from a home-screen widget, with camera, quality, frame rate and file size settings. English and Russian.

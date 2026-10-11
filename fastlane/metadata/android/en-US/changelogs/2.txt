@@ -1,0 +1,1 @@
+Targets Android 16 (API 36) and draws edge to edge. Adds a privacy policy link to the About screen.
