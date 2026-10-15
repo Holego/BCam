@@ -6,8 +6,8 @@ package io.github.holego.bcam.monetization
  * is an interface.
  */
 interface AdStore {
-    /** Cached result of the last Play Billing check: the ad-free subscription is active. */
-    var subscribed: Boolean
+    /** Cached result of the last Play Billing check: the user bought "remove ads". */
+    var adsRemoved: Boolean
 
     /** Wall-clock time (epoch millis) until which a watched reward keeps ads off. */
     var adFreeUntilMs: Long
@@ -43,11 +43,11 @@ class AdPolicy(
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
 
-    /** True while the ad-free subscription is active (as last confirmed by Google Play). */
-    val subscribed: Boolean get() = store.subscribed
+    /** True once "remove ads" has been bought (as last confirmed by Google Play). */
+    val adsRemoved: Boolean get() = store.adsRemoved
 
     /** True when no ad of any kind may be loaded or shown right now. */
-    fun adsSuppressed(): Boolean = store.subscribed || adFreeRemainingMs() > 0L
+    fun adsSuppressed(): Boolean = store.adsRemoved || adFreeRemainingMs() > 0L
 
     /** Milliseconds of reward-based ad-free time left; 0 when none. */
     fun adFreeRemainingMs(): Long {
@@ -62,8 +62,8 @@ class AdPolicy(
         store.adFreeUntilMs = clock() + durationMs
     }
 
-    fun setSubscribed(active: Boolean) {
-        store.subscribed = active
+    fun setAdsRemoved(removed: Boolean) {
+        store.adsRemoved = removed
     }
 
     fun onAppStarted() {

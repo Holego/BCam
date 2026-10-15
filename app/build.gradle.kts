@@ -59,7 +59,7 @@ android {
      *         proprietary dependency. This is what the privacy statements in the README
      *         and the F-Droid metadata describe.
      *  play - Google Play. Adds Google Mobile Ads (AdMob), the UMP consent form and Play
-     *         Billing for the optional ad-free subscription. Everything it adds lives in
+     *         Billing for the one-time "remove ads" purchase. Everything it adds lives in
      *         src/play; src/main has no reference to any of it.
      *
      * Build: assembleFossRelease (APK)   bundlePlayRelease (AAB for Play Console)

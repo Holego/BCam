@@ -19,8 +19,8 @@ FEATURES
 YOUR VIDEOS STAY WITH YOU
 Recordings and settings stay on your device. The app has no account and no analytics of its own.
 
-FREE, WITH ADS YOU CAN TURN OFF
-The app is free and shows ads on its setup screen, never while you are recording and never when you use the widget. An optional auto-renewing subscription turns all ads off while it is active; the price and renewal period are shown in the app and in Google Play before you subscribe, and you can cancel at any time in Google Play. You can also watch a short video to turn ads off for 24 hours.
+FREE, WITH ADS YOU CAN REMOVE
+The app is free and shows ads on its setup screen, never while you are recording and never when you use the widget. A one-time purchase removes all ads for good, and you can also watch a short video to turn them off for 24 hours.
 
 PERMISSIONS
 • Camera: to record video

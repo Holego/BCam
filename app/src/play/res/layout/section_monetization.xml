@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     The "Ads" block on the main screen (Google Play build only): what the user currently has,
-    the ad-free subscription with its terms, the optional reward video, and the ad-privacy
-    entry that EEA/UK users are legally owed.
+    the one-time "remove ads" purchase, the optional reward video, and the ad-privacy entry
+    that EEA/UK users are legally owed.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -39,32 +39,6 @@
         android:minHeight="52dp"
         android:text="@string/ads_remove_button_noprice"
         app:cornerRadius="16dp" />
-
-    <!-- Subscription terms: price/renewal/cancellation must be visible before purchase. -->
-    <TextView
-        android:id="@+id/ads_subscription_terms"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/ads_subscription_terms"
-        android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textColor="?android:attr/textColorSecondary"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/ads_manage_subscription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:minHeight="48dp"
-        android:text="@string/ads_manage_subscription"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        android:textColor="?attr/colorPrimary"
-        android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/ads_reward_button"

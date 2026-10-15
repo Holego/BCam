@@ -1,8 +1,5 @@
 package io.github.holego.bcam.monetization
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -33,7 +30,7 @@ import io.github.holego.bcam.R
  *  - app-open: when the user comes back to the app after a while away;
  *  - rewarded: only when the user taps "watch a video".
  * Never while recording, never from the widget or notification, and nothing is shown at all
- * while the ad-free subscription is active or a reward is running.
+ * once "remove ads" is bought or a reward is active.
  */
 internal class MonetizationController(private val activity: AppCompatActivity) :
     DefaultLifecycleObserver {
@@ -77,10 +74,6 @@ internal class MonetizationController(private val activity: AppCompatActivity) :
 
         section.findViewById<Button>(R.id.ads_remove_button).setOnClickListener { onRemoveAdsClicked() }
         section.findViewById<Button>(R.id.ads_reward_button).setOnClickListener { onRewardClicked() }
-        section.findViewById<View>(R.id.ads_manage_subscription).setOnClickListener {
-            suppressNextAppOpen = true
-            openSubscriptionSettings()
-        }
         section.findViewById<View>(R.id.ads_privacy_options).setOnClickListener {
             suppressNextAppOpen = true
             consent.showPrivacyOptions { render() }
@@ -143,7 +136,7 @@ internal class MonetizationController(private val activity: AppCompatActivity) :
     private fun onEntitlement(owned: Boolean?) {
         if (destroyed) return
         // null: Play could not be reached - keep whatever was cached.
-        if (owned != null) policy.setSubscribed(owned)
+        if (owned != null) policy.setAdsRemoved(owned)
         entitlementKnown = true
         render()
         startAdsIfAllowed()
@@ -188,19 +181,6 @@ internal class MonetizationController(private val activity: AppCompatActivity) :
         if (!billing.launchPurchase(activity)) toast(R.string.purchase_unavailable)
     }
 
-    /** Google Play's own page for this subscription: change plan, cancel, update payment. */
-    private fun openSubscriptionSettings() {
-        val uri = Uri.parse(
-            "https://play.google.com/store/account/subscriptions" +
-                "?sku=" + BillingManager.PRODUCT_ID + "&package=" + activity.packageName
-        )
-        try {
-            activity.startActivity(Intent(Intent.ACTION_VIEW, uri))
-        } catch (e: ActivityNotFoundException) {
-            toast(R.string.about_no_browser)
-        }
-    }
-
     private fun onRewardClicked() {
         val shown = ads.showRewarded { grantReward() }
         if (!shown) toast(R.string.ads_video_not_ready)
@@ -227,7 +207,7 @@ internal class MonetizationController(private val activity: AppCompatActivity) :
 
     private fun render() {
         if (destroyed) return
-        val subscribed = policy.subscribed
+        val removed = policy.adsRemoved
         val rewardLeftMs = policy.adFreeRemainingMs()
         val suppressed = policy.adsSuppressed()
 
@@ -240,11 +220,9 @@ internal class MonetizationController(private val activity: AppCompatActivity) :
         val status = section.findViewById<TextView>(R.id.ads_status)
         val removeButton = section.findViewById<Button>(R.id.ads_remove_button)
         val rewardButton = section.findViewById<Button>(R.id.ads_reward_button)
-        val terms = section.findViewById<TextView>(R.id.ads_subscription_terms)
-        val manage = section.findViewById<View>(R.id.ads_manage_subscription)
 
         status.text = when {
-            subscribed -> activity.getString(R.string.ads_status_subscribed)
+            removed -> activity.getString(R.string.ads_status_removed)
             rewardLeftMs > 0L -> {
                 val minutes = (rewardLeftMs / 60_000L).toInt()
                 activity.getString(R.string.ads_status_reward, minutes / 60, minutes % 60)
@@ -252,18 +230,13 @@ internal class MonetizationController(private val activity: AppCompatActivity) :
             else -> activity.getString(R.string.ads_status_on)
         }
 
-        removeButton.visibility = if (subscribed) View.GONE else View.VISIBLE
-        val offer = billing.offer
-        removeButton.text = if (offer != null) {
-            activity.getString(R.string.ads_remove_button, priceWithPeriod(offer))
+        removeButton.visibility = if (removed) View.GONE else View.VISIBLE
+        val price = billing.formattedPrice
+        removeButton.text = if (price != null) {
+            activity.getString(R.string.ads_remove_button, price)
         } else {
             activity.getString(R.string.ads_remove_button_noprice)
         }
-
-        // Play's subscription policy: price, renewal and how to cancel must be stated before
-        // the user can buy. Shown whenever the button is, once the real terms are known.
-        terms.visibility = if (!subscribed && offer != null) View.VISIBLE else View.GONE
-        manage.visibility = if (subscribed) View.VISIBLE else View.GONE
 
         // Only offered when there is actually an ad to watch.
         rewardButton.visibility =
@@ -271,22 +244,6 @@ internal class MonetizationController(private val activity: AppCompatActivity) :
 
         section.findViewById<View>(R.id.ads_privacy_options).visibility =
             if (consent.privacyOptionsRequired) View.VISIBLE else View.GONE
-    }
-
-    /** "$9.00 per year", "$1.99 per month", "$4.99 every 3 months" - or just the price. */
-    private fun priceWithPeriod(offer: SubscriptionOffer): String {
-        val period = offer.period ?: return offer.formattedPrice
-        val n = period.count
-        val label = when {
-            n == 1 && period.unit == PeriodUnit.WEEK -> activity.getString(R.string.period_week)
-            n == 1 && period.unit == PeriodUnit.MONTH -> activity.getString(R.string.period_month)
-            n == 1 && period.unit == PeriodUnit.YEAR -> activity.getString(R.string.period_year)
-            period.unit == PeriodUnit.DAY -> activity.getString(R.string.period_every_days, n)
-            period.unit == PeriodUnit.WEEK -> activity.getString(R.string.period_every_weeks, n)
-            period.unit == PeriodUnit.MONTH -> activity.getString(R.string.period_every_months, n)
-            else -> activity.getString(R.string.period_every_years, n)
-        }
-        return offer.formattedPrice + " " + label
     }
 
     /** Called when a native ad has loaded; shows it as a labelled card under the settings. */

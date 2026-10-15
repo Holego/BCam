@@ -8,7 +8,7 @@ import org.junit.Test
 class AdPolicyTest {
 
     private class FakeStore : AdStore {
-        override var subscribed = false
+        override var adsRemoved = false
         override var adFreeUntilMs = 0L
         override var launchCount = 0
         override var stopCount = 0
@@ -29,12 +29,12 @@ class AdPolicyTest {
     }
 
     @Test
-    fun activeSubscriptionSuppressesAdsUntilItLapses() {
-        policy.setSubscribed(true)
+    fun purchaseSuppressesAdsForGood() {
+        policy.setAdsRemoved(true)
         assertTrue(policy.adsSuppressed())
         now += 1000 * hour
         assertTrue(policy.adsSuppressed())
-        policy.setSubscribed(false)
+        policy.setAdsRemoved(false)
         assertFalse(policy.adsSuppressed())
     }
 
@@ -118,7 +118,7 @@ class AdPolicyTest {
     fun appOpenRespectsAdFreeState() {
         policy.onAppStarted()
         policy.onAppStarted()
-        policy.setSubscribed(true)
+        policy.setAdsRemoved(true)
         assertFalse(policy.canShowAppOpen())
     }
 }
