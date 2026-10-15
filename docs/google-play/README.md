@@ -49,7 +49,14 @@
    | `RELEASE_KEYSTORE_BASE64` | содержимое буфера из шага 2 |
    | `RELEASE_STORE_PASSWORD` | пароль хранилища (новый, см. раздел 2) |
    | `RELEASE_KEY_ALIAS` | `bcam` |
-   | `RELEASE_KEY_PASSWORD` | пароль ключа (новый) |
+   | `RELEASE_KEY_PASSWORD` | пароль ключа. Для файла формата PKCS12 (по умолчанию у современного `keytool`) он **всегда совпадает с паролем хранилища** — впишите то же значение |
+
+Перед сборкой workflow сам проверяет ключ и называет причину, если что-то не так, не показывая
+пароли: неверный пароль хранилища, несуществующий alias, разные пароли у PKCS12, пробел или
+перевод строки в конце секрета. Ошибка вида `keystore password was incorrect` означает, что
+`RELEASE_STORE_PASSWORD` не равен тому паролю, который в данный момент у файла `.jks`, **или** что
+в `RELEASE_KEYSTORE_BASE64` лежит старая копия файла: после смены пароля через `keytool` файл нужно
+закодировать в base64 заново и обновить этот секрет.
 
 Каждый раз, когда нужен файл: **Actions → «Release AAB for Google Play» → Run workflow**.
 Через несколько минут внизу страницы запуска появится артефакт **`play-release-aab`** (zip с
@@ -80,10 +87,17 @@ gradlew bundlePlayRelease
 
 ```
 keytool -storepasswd -keystore C:\GoshanData\keys\bcam-release.jks
-keytool -keypasswd  -alias bcam -keystore C:\GoshanData\keys\bcam-release.jks
 ```
 
-Затем обновите `local.properties` и секреты GitHub. Из `.gitignore` пароли уже убраны в этой ветке;
+Это **одна** команда. У файла формата PKCS12 (так создаёт `keytool` с JDK 9+) пароль ключа и
+пароль хранилища — одно и то же значение, и отдельная команда `keytool -keypasswd` для него
+не поддерживается (выдаёт ошибку). Тип файла видно по строке `Keystore type` в выводе
+`keytool -list -keystore …`. Новый пароль впишите **в оба** места: `RELEASE_STORE_PASSWORD` и
+`RELEASE_KEY_PASSWORD` (в секретах GitHub и в `local.properties`), а изменённый файл заново
+закодируйте в `RELEASE_KEYSTORE_BASE64`. Для старого формата JKS пароли можно менять отдельно
+(`-storepasswd` и `-keypasswd -alias bcam`).
+
+Из `.gitignore` пароли уже убраны;
 в истории они остаются — переписывать историю публичного репозитория смысла нет, достаточно сменить
 пароль.
 
