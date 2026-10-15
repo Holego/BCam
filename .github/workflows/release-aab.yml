@@ -1,0 +1,76 @@
+name: Release AAB for Google Play
+
+# Builds the signed Android App Bundle you upload to the Play Console. The signing key never
+# touches the repository: it is read from encrypted repository secrets (Settings > Secrets
+# and variables > Actions), written to a temporary file for the build and deleted after.
+#
+# Required secrets:
+#   RELEASE_KEYSTORE_BASE64   the .jks file, base64-encoded
+#   RELEASE_STORE_PASSWORD    keystore password
+#   RELEASE_KEY_ALIAS         key alias (bcam)
+#   RELEASE_KEY_PASSWORD      key password
+#
+# Run it from the Actions tab (Run workflow). The result is the "play-release-aab" artefact
+# at the bottom of the run page.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Restore the signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          for v in KEYSTORE_B64 STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Repository secret for $v is not set - see the comment at the top of this workflow"
+              exit 1
+            fi
+          done
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          {
+            echo "RELEASE_STORE_FILE=$RUNNER_TEMP/release.jks"
+            echo "RELEASE_STORE_PASSWORD=$STORE_PASSWORD"
+            echo "RELEASE_KEY_ALIAS=$KEY_ALIAS"
+            echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+
+      - name: Build the signed bundle
+        run: ./gradlew --no-daemon :app:bundlePlayRelease
+
+      - name: Show which key signed it
+        run: |
+          AAB=$(ls app/build/outputs/bundle/playRelease/*.aab | head -n 1)
+          jarsigner -verify "$AAB" | head -n 3
+          keytool -printcert -jarfile "$AAB" | grep -E 'Owner|SHA1|SHA256|Valid'
+
+      - name: Upload the bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: play-release-aab
+          path: app/build/outputs/bundle/playRelease/*.aab
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Delete the key from the runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks"

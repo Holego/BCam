@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    The root is a plain vertical stack so that a banner can sit under the scrolling content.
+    The three FrameLayouts marked "monetization slot" are empty and hidden here; only the
+    Google Play build puts anything into them (see src/play). In the foss build they stay
+    empty and cost nothing.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
     android:fillViewport="true">
 
     <LinearLayout
@@ -301,6 +313,21 @@
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
         </LinearLayout>
 
+        <!-- monetization slot: "Ads" block with the remove-ads purchase -->
+        <FrameLayout
+            android:id="@+id/monetization_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <!-- monetization slot: native ad card -->
+        <FrameLayout
+            android:id="@+id/ad_native_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -311,3 +338,13 @@
             android:textColor="?android:attr/textColorSecondary" />
     </LinearLayout>
 </ScrollView>
+
+<!-- monetization slot: adaptive banner, pinned under the scrolling content -->
+<FrameLayout
+    android:id="@+id/ad_banner_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:visibility="gone" />
+
+</LinearLayout>

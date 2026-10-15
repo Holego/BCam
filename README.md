@@ -5,18 +5,34 @@ app** — from a home-screen widget or the Stop button in the notification. It k
 recording with the screen off and does nothing else.
 
 Kotlin + CameraX + Foreground Service + Storage Access Framework. No Compose, no WebView,
-no Flutter, no React Native, no heavy third-party libraries. 
+no Flutter, no React Native, no heavy third-party libraries.
+
+Two distributions are built from this source tree:
+
+| Flavor | Where | What it contains |
+|---|---|---|
+| `foss` | F-Droid, GitHub | The app as described below: no ads, no billing, **no `INTERNET` permission**, no proprietary code. |
+| `play` | Google Play | The same app plus Google Mobile Ads (AdMob), Google's consent form (UMP) and Play Billing for a one-time "remove ads" purchase. Everything extra lives in `app/src/play`; `app/src/main` knows nothing about it. |
+
+Unless a section says otherwise, this document describes the `foss` build. For the privacy
+policy of both see [PRIVACY.md](PRIVACY.md); for publishing to Google Play see
+[docs/google-play](docs/google-play/README.md).
 
 ---
 
 ## Building
 
 ```bash
-gradlew assembleDebug     # installable, debug-signed, debuggable
-gradlew assembleRelease   # unsigned unless a keystore is configured
+gradlew assembleFossDebug       # installable, debug-signed, debuggable
+gradlew assembleFossRelease     # F-Droid / GitHub APK; unsigned unless a keystore is configured
+gradlew bundlePlayRelease       # .aab for the Play Console; signed if a keystore is configured
+gradlew assemblePlayDebug       # Play flavor with Google's sample (test) ads
+gradlew testPlayDebugUnitTest   # unit tests for the ad rules
 ```
 
-The APK declares no `INTERNET` permission.
+The `foss` APK declares no `INTERNET` permission, and CI checks that on every push. Debug
+builds of the `play` flavor use Google's sample ad units, so developing never produces real
+ad traffic; only `release` builds carry the live ad unit ids.
 
 ### Signing a release build
 
@@ -43,30 +59,38 @@ APK, so cloning and building the project never requires a key.
 Keep this keystore safe and backed up: Android identifies an app by package name **and**
 signing key, so losing it means no future version can update an installed one.
 
+### Building the Play bundle in the cloud
+
+The *Release AAB for Google Play* workflow (Actions tab → *Run workflow*) builds the signed
+`.aab` on GitHub's runners, so nothing has to be installed locally. It reads the key from four
+repository secrets — `RELEASE_KEYSTORE_BASE64`, `RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS`,
+`RELEASE_KEY_PASSWORD` — and the result is the `play-release-aab` artefact of the run.
+
 ---
 
 ## Build requirements
 
-JDK 17 (AGP 8.5 does not run on JDK 25) and Android SDK Platform 34.
+JDK 17 and Android SDK Platform 36 (JDK 25 is too new for this AGP).
 
 > Keep `!` out of the project path. Kotlin's compiler treats `!/` as the JAR-entry
 > separator and fails on the generated `R.jar`. Android Studio behaves the same way.
 
 | Component | Version |
 |---|---|
-| Android Gradle Plugin | 8.5.2 |
-| Gradle | 8.7 |
-| Kotlin | 1.9.24 |
-| compileSdk / targetSdk | 34 |
+| Android Gradle Plugin | 8.13.0 |
+| Gradle | 8.13 |
+| Kotlin | 2.2.20 |
+| compileSdk / targetSdk | 36 (Google Play requires 36 for new releases from 31 Aug 2026) |
 | minSdk | 26 |
 | CameraX | 1.3.4 |
+| Google Mobile Ads SDK / Play Billing *(play flavor only)* | 25.4.0 / 9.1.0 |
 
 ---
 
 ## Layout
 
 ```
-app/src/main/java/com/example/videorecorder/
+app/src/main/java/io/github/holego/bcam/
 ├─ MainActivity.kt                     setup screen and manual start/stop
 ├─ AboutActivity.kt                    what the app is, privacy, contact links
 ├─ recording/
@@ -82,6 +106,15 @@ app/src/main/java/com/example/videorecorder/
 │   └─ SettingsRepository.kt           SharedPreferences
 └─ widget/
     └─ RecordingWidgetProvider.kt      home-screen button
+
+app/src/play/…/monetization/           Google Play flavor only
+├─ MonetizationController.kt           the four calls MainActivity makes; wires everything below
+├─ AdsManager.kt                       banner, interstitial, rewarded (+ interstitial), native, app-open
+├─ AdPolicy.kt                         when ads may show (pure Kotlin, unit-tested)
+├─ ConsentManager.kt                   Google's UMP consent form
+├─ BillingManager.kt                   the one-time "remove_ads" product
+└─ AdUnits.kt                          ad unit ids (test units in debug, live units in release)
+app/src/foss/…/monetization/           an empty MonetizationController with the same API
 ```
 
 All active recording lives in `RecordingService`. `MainActivity` only configures and sends
@@ -212,6 +245,9 @@ the camera advertises are offered, and the setting defaults to Auto.
 ---
 
 ## Privacy
+
+*This section describes the `foss` (F-Droid / GitHub) build. The Google Play build adds ads
+and a purchase and therefore uses the network; see [PRIVACY.md](PRIVACY.md).*
 
 The app collects, stores and transmits nothing. No account, no analytics, no crash
 reporting, no telemetry, and no `INTERNET` permission at all. Videos are written straight

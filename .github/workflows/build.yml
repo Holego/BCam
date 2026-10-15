@@ -1,0 +1,76 @@
+name: Build
+
+# Runs on every push and pull request. Needs no secrets: it builds unsigned artefacts and,
+# to prove the release signing path works, signs once with a throw-away key made on the fly.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Unit tests (Google Play flavor logic)
+        run: ./gradlew --no-daemon :app:testPlayDebugUnitTest
+
+      - name: Build F-Droid / GitHub APK, Play debug APK and Play bundle
+        run: ./gradlew --no-daemon :app:assembleFossRelease :app:assemblePlayDebug :app:bundlePlayRelease
+
+      - name: The foss build must stay free of network access and Google code
+        run: |
+          APK=$(ls app/build/outputs/apk/foss/release/*.apk | head -n 1)
+          AAPT2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -n 1)
+          echo "Checking $APK"
+          "$AAPT2" dump permissions "$APK" | tee permissions.txt
+          if grep -qE 'INTERNET|ACCESS_NETWORK_STATE|AD_ID' permissions.txt; then
+            echo "::error::foss build declares a network/ads permission"; exit 1
+          fi
+          if unzip -p "$APK" 'classes*.dex' | grep -aq 'com/google/android/gms'; then
+            echo "::error::foss build contains Google Play services code"; exit 1
+          fi
+          echo "foss build is clean"
+
+      - name: The play build must declare what ads and billing need
+        run: |
+          APK=$(ls app/build/outputs/apk/play/debug/*.apk | head -n 1)
+          AAPT2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -n 1)
+          "$AAPT2" dump permissions "$APK" | tee play-permissions.txt
+          for p in INTERNET ACCESS_NETWORK_STATE AD_ID; do
+            grep -q "$p" play-permissions.txt || { echo "::error::play build is missing $p"; exit 1; }
+          done
+
+      - name: Signing smoke test with a throw-away key
+        env:
+          RELEASE_STORE_PASSWORD: throwaway-pass
+          RELEASE_KEY_ALIAS: smoke
+          RELEASE_KEY_PASSWORD: throwaway-pass
+        run: |
+          keytool -genkeypair -keystore "$RUNNER_TEMP/smoke.jks" -storepass throwaway-pass \
+            -keypass throwaway-pass -alias smoke -keyalg RSA -keysize 2048 -validity 2 \
+            -dname "CN=smoke test"
+          export RELEASE_STORE_FILE="$RUNNER_TEMP/smoke.jks"
+          ./gradlew --no-daemon :app:bundlePlayRelease
+          AAB=$(ls app/build/outputs/bundle/playRelease/*.aab | head -n 1)
+          jarsigner -verify -certs "$AAB" | head -n 20
+          jarsigner -verify "$AAB" | grep -q "jar verified"
+
+      - name: Upload the Play debug APK for manual testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: play-debug-apk
+          path: app/build/outputs/apk/play/debug/*.apk
+          retention-days: 7

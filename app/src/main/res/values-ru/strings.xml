@@ -59,6 +59,7 @@
     <string name="about_source_title">Исходный код</string>
     <string name="about_source_body">Приложение с открытым исходным кодом. Сборка, опубликованная на F-Droid и GitHub, не содержит рекламы, платежей и вообще никакого доступа к сети.</string>
     <string name="about_contact_title">Связь</string>
+    <string name="about_privacy_policy">Политика конфиденциальности</string>
     <string name="about_github">GitHub — Holego</string>
     <string name="about_jabber">Jabber — Jopirat@jabber.fr</string>
     <string name="about_version">Версия %1$s</string>

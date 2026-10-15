@@ -1,0 +1,31 @@
+Background Camera records video without you having to keep the app open. Set it up once, add the widget to your home screen, and from then on one tap starts a recording and one tap stops it. Recording carries on with the screen locked.
+
+HOW IT WORKS
+• Choose a folder, a camera and a quality once.
+• Add the Background Camera widget to your home screen.
+• Tap it to start recording. Tap it again, or press Stop in the notification, to finish.
+
+A notification is always shown while a recording is running, and Android shows its own camera and microphone indicators. The app never hides what it is doing.
+
+FEATURES
+• One-tap home-screen widget
+• Stop button in the ongoing notification
+• Keeps recording with the screen off and after the app is closed from recent apps
+• Videos are saved straight into a folder you choose; nothing is uploaded anywhere
+• Choose the camera, resolution, frame rate and file size (Standard, Light, Smallest)
+• Optional audio recording
+• English and Russian, switchable inside the app
+
+YOUR VIDEOS STAY WITH YOU
+Recordings and settings stay on your device. The app has no account and no analytics of its own.
+
+FREE, WITH ADS YOU CAN REMOVE
+The app is free and shows ads on its setup screen, never while you are recording and never when you use the widget. A one-time purchase removes all ads for good, and you can also watch a short video to turn them off for 24 hours.
+
+PERMISSIONS
+• Camera: to record video
+• Microphone: only if you switch on audio recording
+• Notifications: to show that a recording is running
+• Foreground service: keeps the recording alive while the screen is off
+
+Please respect other people's privacy. Recording people may require their consent and is regulated by law in many countries; you are responsible for using the app lawfully.
