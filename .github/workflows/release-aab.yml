@@ -8,7 +8,8 @@ name: Release AAB for Google Play
 #   RELEASE_KEYSTORE_BASE64   the .jks file, base64-encoded
 #   RELEASE_STORE_PASSWORD    keystore password
 #   RELEASE_KEY_ALIAS         key alias (bcam)
-#   RELEASE_KEY_PASSWORD      key password
+#   RELEASE_KEY_PASSWORD      key password (for a PKCS12 .jks - the default of modern keytool -
+#                             this is always the same value as the keystore password)
 #
 # Run it from the Actions tab (Run workflow). The result is the "play-release-aab" artefact
 # at the bottom of the run page.
@@ -53,6 +54,55 @@ jobs:
             echo "RELEASE_KEY_ALIAS=$KEY_ALIAS"
             echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD"
           } >> "$GITHUB_ENV"
+
+      - name: Check that the key opens (reports what is wrong without printing secrets)
+        run: |
+          # Checks the signing key the way the build will use it and says *what* is wrong,
+          # without ever printing a secret. The values come from the previous step via GITHUB_ENV.
+          set -u
+          TMP="${RUNNER_TEMP:-/tmp}"
+          fail() { echo "::error::$1"; exit 1; }
+
+          for v in RELEASE_STORE_PASSWORD RELEASE_KEY_ALIAS RELEASE_KEY_PASSWORD; do
+            if [[ "${!v}" =~ ^[[:space:]] || "${!v}" =~ [[:space:]]$ ]]; then
+              echo "::warning::$v starts or ends with a space or line break - usually a copy-paste slip. / В $v пробел или перевод строки по краям - обычно ошибка при вставке."
+            fi
+          done
+
+          if ! keytool -list -keystore "$RELEASE_STORE_FILE" -storepass "$RELEASE_STORE_PASSWORD" >"$TMP/kt.out" 2>&1; then
+            if grep -qiE "password was incorrect|tampered" "$TMP/kt.out"; then
+              fail "RELEASE_STORE_PASSWORD does not open the keystore: it is not the password this .jks file has now. If you changed the password with keytool, put the NEW one here. / RELEASE_STORE_PASSWORD не подходит к хранилищу: это не тот пароль, который сейчас у файла .jks. Если вы меняли пароль через keytool, впишите сюда НОВЫЙ."
+            fi
+            fail "The keystore cannot be read ($(grep -v '^Picked up' "$TMP/kt.out" | head -n 1)). Was RELEASE_KEYSTORE_BASE64 copied completely? / Хранилище не читается. Секрет RELEASE_KEYSTORE_BASE64 вставлен целиком?"
+          fi
+
+          TYPE=$(grep -m1 '^Keystore type' "$TMP/kt.out" | sed 's/^Keystore type: *//')
+          echo "Keystore type: $TYPE"
+
+          if ! keytool -list -keystore "$RELEASE_STORE_FILE" -storepass "$RELEASE_STORE_PASSWORD" -alias "$RELEASE_KEY_ALIAS" >"$TMP/kt-alias.out" 2>&1; then
+            echo "Aliases in this keystore:"
+            grep -E 'PrivateKeyEntry|trustedCertEntry' "$TMP/kt.out" | cut -d, -f1 | sed 's/^/  /'
+            fail "RELEASE_KEY_ALIAS does not exist in the keystore (see the list above). / Такого alias в хранилище нет (список выше)."
+          fi
+
+          if [ "$TYPE" = "PKCS12" ]; then
+            # PKCS12 protects the key with the store password; keytool cannot give them different values.
+            if [ "$RELEASE_KEY_PASSWORD" != "$RELEASE_STORE_PASSWORD" ]; then
+              fail "This is a PKCS12 keystore, where the key password is always the same as the store password. Set RELEASE_KEY_PASSWORD to exactly the value of RELEASE_STORE_PASSWORD. / Хранилище формата PKCS12: пароль ключа всегда равен паролю хранилища. Впишите в RELEASE_KEY_PASSWORD то же значение, что в RELEASE_STORE_PASSWORD."
+            fi
+          else
+            cp "$RELEASE_STORE_FILE" "$TMP/check-copy.jks"
+            if ! keytool -keypasswd -keystore "$TMP/check-copy.jks" -storepass "$RELEASE_STORE_PASSWORD" \
+                  -alias "$RELEASE_KEY_ALIAS" -keypass "$RELEASE_KEY_PASSWORD" -new "$RELEASE_KEY_PASSWORD" >"$TMP/kt-key.out" 2>&1 \
+               && grep -qi "cannot recover key" "$TMP/kt-key.out"; then
+              rm -f "$TMP/check-copy.jks"
+              fail "RELEASE_KEY_PASSWORD is not the password of this key. / RELEASE_KEY_PASSWORD не подходит к ключу."
+            fi
+            rm -f "$TMP/check-copy.jks"
+          fi
+
+          echo "Signing key looks fine. Certificate fingerprints (public, compare them with the upload key in Play Console):"
+          grep -E 'SHA-?(1|256)' "$TMP/kt-alias.out" | sed 's/^/  /' || tail -n 2 "$TMP/kt-alias.out" | sed 's/^/  /'
 
       - name: Build the signed bundle
         run: ./gradlew --no-daemon :app:bundlePlayRelease
