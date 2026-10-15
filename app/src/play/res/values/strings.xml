@@ -5,16 +5,27 @@
     and would be false here.
 -->
 <resources>
-    <string name="about_privacy_body">Your videos never leave your device: recordings are written straight into the folder you choose, and the app has no account, no analytics and no crash reporting of its own.\n\nThis free version shows ads from Google AdMob. To serve them, Google may use your device\'s advertising ID and approximate location, depending on the choice you make in the consent message. If you are in the EEA, the UK or Switzerland you can review or change that choice at any time under \"Ad privacy settings\" on the main screen. A one-time purchase removes all ads, and the ad SDK is then never started.\n\nOnly the permissions required for recording are requested: camera, microphone (only when audio recording is enabled), notifications for the recording indicator, and a wake lock so that recording continues while the screen is off. The network permission is used only for ads and for the purchase.</string>
-    <string name="about_source_body">This app is open source. The build published on F-Droid and GitHub contains no ads, no billing and no network access at all; this Google Play build adds ads and a one-time \"remove ads\" purchase.</string>
+    <string name="about_privacy_body">Your videos never leave your device: recordings are written straight into the folder you choose, and the app has no account, no analytics and no crash reporting of its own.\n\nThis free version shows ads from Google AdMob. To serve them, Google may use your device\'s advertising ID and approximate location, depending on the choice you make in the consent message. If you are in the EEA, the UK or Switzerland you can review or change that choice at any time under \"Ad privacy settings\" on the main screen. An optional subscription turns all ads off, and while it is active the ad SDK is not started at all.\n\nOnly the permissions required for recording are requested: camera, microphone (only when audio recording is enabled), notifications for the recording indicator, and a wake lock so that recording continues while the screen is off. The network permission is used only for ads and for the purchase.</string>
+    <string name="about_source_body">This app is open source. The build published on F-Droid and GitHub contains no ads, no billing and no network access at all; this Google Play build adds ads and an optional ad-free subscription.</string>
 
     <!-- Ads block on the main screen -->
     <string name="ads_title">Ads</string>
     <string name="ads_status_on">This free version shows ads. Ads never appear while you are recording.</string>
-    <string name="ads_status_removed">Ads are removed. Thank you for your support!</string>
+    <string name="ads_status_subscribed">Ads are off while your subscription is active. Thank you for your support!</string>
     <string name="ads_status_reward">Ads are off for another %1$d h %2$d min.</string>
-    <string name="ads_remove_button">Remove ads for good — %1$s</string>
-    <string name="ads_remove_button_noprice">Remove ads</string>
+    <string name="ads_remove_button">Remove ads — %1$s</string>
+    <string name="ads_remove_button_noprice">Remove ads (subscription)</string>
+    <string name="ads_subscription_terms">An auto-renewing subscription: it renews at the price shown until you cancel it. You can manage or cancel it at any time in Google Play under Subscriptions.</string>
+    <string name="ads_manage_subscription">Manage subscription</string>
+
+    <!-- Renewal period, appended to the price: "$9.00 per year" -->
+    <string name="period_week">per week</string>
+    <string name="period_month">per month</string>
+    <string name="period_year">per year</string>
+    <string name="period_every_days">every %1$d days</string>
+    <string name="period_every_weeks">every %1$d weeks</string>
+    <string name="period_every_months">every %1$d months</string>
+    <string name="period_every_years">every %1$d years</string>
     <string name="ads_reward_button">Watch a video — no ads for 24 hours</string>
     <string name="ads_privacy_options">Ad privacy settings</string>
     <string name="ads_video_not_ready">The video isn\'t ready yet. Please try again in a moment.</string>
@@ -22,9 +33,9 @@
 
     <!-- Purchase -->
     <string name="purchase_unavailable">Purchases are unavailable right now. Please try again later.</string>
-    <string name="purchase_pending">Your payment is pending. Ads will be removed once it completes.</string>
+    <string name="purchase_pending">Your payment is pending. Ads will be turned off once it completes.</string>
     <string name="purchase_failed">The purchase could not be completed.</string>
-    <string name="purchase_thanks">Thank you! Ads have been removed.</string>
+    <string name="purchase_thanks">Thank you! Ads are now off.</string>
 
     <!-- Reward offer shown after a recording is stopped -->
     <string name="reward_offer_title">Take a break from ads?</string>

@@ -12,9 +12,9 @@ on F-Droid and GitHub.
   them anywhere, and the developer has no server that could receive them.
 * The app has **no account, no analytics and no crash reporting of its own.**
 * The **F-Droid / GitHub version has no network access at all** and no ads.
-* The **Google Play version shows ads (Google AdMob)** and offers a one-time purchase that
-  removes them. Those two features use the internet and are the only reason this policy has
-  more than a few lines.
+* The **Google Play version shows ads (Google AdMob)** and offers an optional subscription
+  that turns them off. Those two features use the internet and are the only reason this policy
+  has more than a few lines.
 
 ## What stays on your device
 
@@ -54,12 +54,15 @@ notification.**
 **Not for children.** The app is not directed to children under 13 (or under the applicable
 age of digital consent) and does not knowingly serve ads to them.
 
-## Google Play version: the "remove ads" purchase
+## Google Play version: the ad-free subscription
 
-The purchase is handled entirely by **Google Play Billing**. The developer never sees your
-payment details. The app only learns from Google Play whether you own the product, and keeps
-a local flag so it can hide ads. If you own it, the ad SDK is not started at all. A purchase
-can be restored on a new device through the same Google account.
+The subscription is an auto-renewing subscription sold and handled entirely by **Google Play
+Billing**: the price, the renewal period and the terms are shown to you before you subscribe,
+and you can change or cancel it at any time in Google Play under *Subscriptions*. The
+developer never sees your payment details. The app only asks Google Play whether your
+subscription is active, and keeps a local flag so it can hide ads. While it is active the ad
+SDK is not started at all. The subscription is restored on a new device through the same
+Google account.
 
 Optionally, you can watch a short rewarded video to turn ads off for 24 hours; the time of
 that reward is stored on the device only.
@@ -111,8 +114,8 @@ F-Droid / GitHub.
   отправляет, а у разработчика нет сервера, который мог бы их принять.
 * **Нет аккаунта, нет собственной аналитики и отчётов о сбоях.**
 * **Версия из F-Droid / GitHub вообще не имеет доступа к сети** и не содержит рекламы.
-* **Версия из Google Play показывает рекламу (Google AdMob)** и предлагает разовую покупку,
-  которая её отключает. Только эти две функции используют интернет.
+* **Версия из Google Play показывает рекламу (Google AdMob)** и предлагает необязательную
+  подписку, которая её отключает. Только эти две функции используют интернет.
 
 ## Что остаётся на устройстве
 
@@ -152,12 +155,14 @@ F-Droid / GitHub.
 **Не для детей.** Приложение не предназначено для детей младше 13 лет (или младше возраста
 цифрового согласия, установленного законом) и сознательно не показывает им рекламу.
 
-## Версия Google Play: покупка «отключить рекламу»
+## Версия Google Play: подписка без рекламы
 
-Покупку полностью обрабатывает **Google Play Billing**. Разработчик не видит ваши платёжные
-данные. Приложение лишь узнаёт от Google Play, куплен ли товар, и хранит локальную отметку,
-чтобы скрывать рекламу. Если покупка есть, рекламный SDK вообще не запускается. Покупку можно
-восстановить на новом устройстве через тот же аккаунт Google.
+Это подписка с автопродлением, которую продаёт и полностью обрабатывает **Google Play
+Billing**: цена, период продления и условия показываются до оформления, а изменить или отменить
+подписку можно в любой момент в Google Play, раздел «Подписки». Разработчик не видит ваши
+платёжные данные. Приложение лишь спрашивает у Google Play, активна ли подписка, и хранит
+локальную отметку, чтобы скрывать рекламу. Пока подписка активна, рекламный SDK вообще не
+запускается. На новом устройстве подписка восстанавливается через тот же аккаунт Google.
 
 Дополнительно можно посмотреть короткое видео и отключить рекламу на 24 часа; время такой
 награды хранится только на устройстве.

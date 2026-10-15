@@ -12,7 +12,7 @@ Two distributions are built from this source tree:
 | Flavor | Where | What it contains |
 |---|---|---|
 | `foss` | F-Droid, GitHub | The app as described below: no ads, no billing, **no `INTERNET` permission**, no proprietary code. |
-| `play` | Google Play | The same app plus Google Mobile Ads (AdMob), Google's consent form (UMP) and Play Billing for a one-time "remove ads" purchase. Everything extra lives in `app/src/play`; `app/src/main` knows nothing about it. |
+| `play` | Google Play | The same app plus Google Mobile Ads (AdMob), Google's consent form (UMP) and Play Billing for an optional ad-free subscription. Everything extra lives in `app/src/play`; `app/src/main` knows nothing about it. |
 
 Unless a section says otherwise, this document describes the `foss` build. For the privacy
 policy of both see [PRIVACY.md](PRIVACY.md); for publishing to Google Play see
@@ -112,7 +112,8 @@ app/src/play/…/monetization/           Google Play flavor only
 ├─ AdsManager.kt                       banner, interstitial, rewarded (+ interstitial), native, app-open
 ├─ AdPolicy.kt                         when ads may show (pure Kotlin, unit-tested)
 ├─ ConsentManager.kt                   Google's UMP consent form
-├─ BillingManager.kt                   the one-time "remove_ads" product
+├─ BillingManager.kt                   the ad-free subscription (product id "ad_free")
+├─ SubscriptionPeriod.kt               parses Play's ISO-8601 renewal period (unit-tested)
 └─ AdUnits.kt                          ad unit ids (test units in debug, live units in release)
 app/src/foss/…/monetization/           an empty MonetizationController with the same API
 ```

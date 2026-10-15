@@ -16,25 +16,35 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import io.github.holego.bcam.R
 
+/** What the screen needs to say about the subscription before the user taps. */
+internal data class SubscriptionOffer(
+    /** Localised price of one renewal, e.g. "$9.00", straight from Google Play. */
+    val formattedPrice: String,
+    /** How often it renews; null if Play reported something this app does not recognise. */
+    val period: SubscriptionPeriod?,
+)
+
 /**
- * The one-time "remove ads" purchase, through Google Play Billing.
+ * The ad-free subscription, through Google Play Billing.
  *
- * Product: a *non-consumable* in-app product with id [PRODUCT_ID], priced at US$9.00 in
- * the Play Console. The price shown in the app is whatever Play reports for the user's
- * country, so it is never hard-coded here.
+ * Product: an auto-renewing subscription with id [PRODUCT_ID] and exactly one base plan,
+ * both created in the Play Console. The price and the renewal period are read from Google
+ * Play at run time and are never hard-coded, so they can be changed in the Console without
+ * an app update.
  *
- * Entitlement is re-checked with Google Play on every start ([queryOwned]); that is also
- * how a purchase is restored after a reinstall or on a new device, and how a refund takes
- * effect. If Play cannot be reached the last known answer is kept.
+ * "Subscribed" is re-checked with Google Play on every start ([queryOwned]). That is how a
+ * subscription is restored after a reinstall or on a new device, and how a lapse, a
+ * cancellation that has run out, a refund or an account hold takes effect. If Play cannot
+ * be reached the last known answer is kept.
  *
- * There is no backend, so purchases are not verified server-side. For a US$9 unlock in a
- * small app that is an accepted trade-off; it does mean a rooted device can fake the
+ * There is no backend, so purchases are not verified server-side. For an ad-free toggle in
+ * a small app that is an accepted trade-off; it does mean a rooted device can fake the
  * entitlement locally.
  */
 internal class BillingManager(
     context: Context,
     /** `true`/`false` once Play has answered; `null` when it could not be reached. */
-    private val onEntitlement: (owned: Boolean?) -> Unit,
+    private val onEntitlement: (subscribed: Boolean?) -> Unit,
     private val onProductReady: () -> Unit,
     private val onMessage: (messageRes: Int) -> Unit,
 ) : PurchasesUpdatedListener {
@@ -48,10 +58,11 @@ internal class BillingManager(
         .build()
 
     private var productDetails: ProductDetails? = null
+    private var chosenOffer: ProductDetails.SubscriptionOfferDetails? = null
 
-    /** Localised price such as "$9.00", or null until Play has described the product. */
-    val formattedPrice: String?
-        get() = productDetails?.oneTimePurchaseOfferDetails?.formattedPrice
+    /** Price and period to show, or null until Play has described the subscription. */
+    var offer: SubscriptionOffer? = null
+        private set
 
     fun start() {
         client.startConnection(object : BillingClientStateListener {
@@ -76,14 +87,16 @@ internal class BillingManager(
         client.endConnection()
     }
 
-    /** Opens Google Play's purchase sheet. Returns false if the product is not available. */
+    /** Opens Google Play's subscription sheet. Returns false if the product is not available. */
     fun launchPurchase(activity: Activity): Boolean {
         val details = productDetails ?: return false
+        val offerToken = chosenOffer?.offerToken ?: return false
         val params = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(
                 listOf(
                     BillingFlowParams.ProductDetailsParams.newBuilder()
                         .setProductDetails(details)
+                        .setOfferToken(offerToken)
                         .build()
                 )
             )
@@ -99,7 +112,7 @@ internal class BillingManager(
         when (result.responseCode) {
             BillingClient.BillingResponseCode.OK -> purchases?.forEach(::handlePurchase)
             BillingClient.BillingResponseCode.USER_CANCELED -> Unit
-            // Bought earlier (reinstall, other device): just re-read what Play knows.
+            // Subscribed earlier (reinstall, other device): just re-read what Play knows.
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> queryOwned()
             else -> {
                 Log.w(TAG, "Purchase failed: " + result.responseCode + " " + result.debugMessage)
@@ -111,16 +124,20 @@ internal class BillingManager(
     private fun queryProduct() {
         val product = QueryProductDetailsParams.Product.newBuilder()
             .setProductId(PRODUCT_ID)
-            .setProductType(BillingClient.ProductType.INAPP)
+            .setProductType(BillingClient.ProductType.SUBS)
             .build()
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(listOf(product))
             .build()
         client.queryProductDetailsAsync(params) { result, queryResult ->
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                productDetails = queryResult.productDetailsList.firstOrNull()
-                if (productDetails == null) {
-                    Log.w(TAG, "Product $PRODUCT_ID is not configured in the Play Console")
+                val details = queryResult.productDetailsList.firstOrNull()
+                if (details == null) {
+                    Log.w(TAG, "Subscription $PRODUCT_ID is not configured in the Play Console")
+                } else {
+                    productDetails = details
+                    chosenOffer = chooseOffer(details)
+                    offer = chosenOffer?.let(::describe)
                 }
             } else {
                 Log.w(TAG, "queryProductDetails: " + result.responseCode + " " + result.debugMessage)
@@ -129,9 +146,28 @@ internal class BillingManager(
         }
     }
 
+    /**
+     * Play lists only the offers this user is eligible for. With a single base plan that is
+     * the base plan; if a free trial or intro price has been configured as well, the one
+     * that costs least to start is chosen, and the base plan wins a tie.
+     */
+    private fun chooseOffer(details: ProductDetails): ProductDetails.SubscriptionOfferDetails? =
+        details.subscriptionOfferDetails.orEmpty().minWithOrNull(
+            compareBy<ProductDetails.SubscriptionOfferDetails>(
+                { it.pricingPhases.pricingPhaseList.firstOrNull()?.priceAmountMicros ?: Long.MAX_VALUE },
+                { it.offerId != null },
+            )
+        )
+
+    /** The terms to show are those of the recurring phase, i.e. what renewals will cost. */
+    private fun describe(offer: ProductDetails.SubscriptionOfferDetails): SubscriptionOffer? {
+        val recurring = offer.pricingPhases.pricingPhaseList.lastOrNull() ?: return null
+        return SubscriptionOffer(recurring.formattedPrice, parseBillingPeriod(recurring.billingPeriod))
+    }
+
     private fun queryOwned() {
         val params = QueryPurchasesParams.newBuilder()
-            .setProductType(BillingClient.ProductType.INAPP)
+            .setProductType(BillingClient.ProductType.SUBS)
             .build()
         client.queryPurchasesAsync(params) { result, purchases ->
             if (result.responseCode != BillingClient.BillingResponseCode.OK) {
@@ -139,9 +175,9 @@ internal class BillingManager(
                 onEntitlement(null)
                 return@queryPurchasesAsync
             }
-            val owned = purchases.filter { ownsRemoveAds(it) }
-            owned.forEach(::acknowledgeIfNeeded)
-            onEntitlement(owned.isNotEmpty())
+            val active = purchases.filter { grantsAdFree(it) }
+            active.forEach(::acknowledgeIfNeeded)
+            onEntitlement(active.isNotEmpty())
         }
     }
 
@@ -159,9 +195,15 @@ internal class BillingManager(
         }
     }
 
-    private fun ownsRemoveAds(purchase: Purchase): Boolean =
+    /**
+     * A subscription that has been cancelled but has not yet run out is still returned as
+     * purchased, and rightly keeps ads off until its end date. One that is suspended
+     * (account hold after a failed payment) is not entitled.
+     */
+    private fun grantsAdFree(purchase: Purchase): Boolean =
         purchase.products.contains(PRODUCT_ID) &&
-            purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+            purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+            !purchase.isSuspended
 
     /**
      * Play refunds a purchase that is not acknowledged within three days. If this call
@@ -178,8 +220,11 @@ internal class BillingManager(
     }
 
     companion object {
-        /** Must match the product id created in Play Console > Monetize > In-app products. */
-        const val PRODUCT_ID = "remove_ads"
+        /**
+         * Must match the subscription id created in Play Console > Monetize with Play >
+         * Products > Subscriptions. It cannot be changed there afterwards.
+         */
+        const val PRODUCT_ID = "ad_free"
         private const val TAG = "Monetization"
     }
 }
